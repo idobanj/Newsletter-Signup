@@ -18,52 +18,8 @@ app.get('/', function (req, res) {
   res.sendFile(__dirname + '/signup.html');
 });
 
-// Email validation
-function isValidEmail(email) {
-  const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return re.test(email);
-}
-
-// Common typo correction
-const COMMON_TYPOS = {
-  'gmial.com': 'gmail.com',
-  'yaho.com': 'yahoo.com',
-  'hotmail.co': 'hotmail.com',
-};
-
 app.post('/', function (req, res) {
   const {firstName, lastName, email} = req.body;
-  const trimmedEmail = email.trim().toLowerCase();
-  const domain = trimmedEmail.split('@')[1];
-
-  // Validation Chain
-  if (!trimmedEmail) {
-    return sendError(res, 'Missing Email', 'Please enter an email address');
-  }
-
-  if (!isValidEmail(trimmedEmail)) {
-    return sendError(
-      res,
-      'Invalid Format',
-      'Please enter a valid email (e.g., user@example.com)'
-    );
-  }
-
-  if (DISPOSABLE_DOMAINS.includes(domain)) {
-    return sendError(
-      res,
-      'Temporary Email Blocked',
-      `We don't accept emails from ${domain}`
-    );
-  }
-
-  if (COMMON_TYPOS[domain]) {
-    return sendError(
-      res,
-      'Possible Typo',
-      `Did you mean ${COMMON_TYPOS[domain]}?`
-    );
-  }
 
   // Basic validation
   if (!firstName || !lastName || !email) {
