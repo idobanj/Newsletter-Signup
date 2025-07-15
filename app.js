@@ -2,7 +2,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const https = require('https');
-const DISPOSABLE_DOMAINS = require('disposable-email-domains');
 
 const app = express();
 
@@ -21,19 +20,47 @@ app.get('/', function (req, res) {
 app.post('/', function (req, res) {
   const {firstName, lastName, email} = req.body;
 
-  // Basic validation
+  // Enhanced validation
   if (!firstName || !lastName || !email) {
+    return res.sendFile(__dirname + '/failure.html');
+  }
+
+  // Email validation function
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Validate email format
+  if (!isValidEmail(email)) {
+    console.log('Invalid email format:', email);
+    return res.sendFile(__dirname + '/failure.html');
+  }
+
+  // Trim and validate input lengths
+  const trimmedFirstName = firstName.trim();
+  const trimmedLastName = lastName.trim();
+  const trimmedEmail = email.trim().toLowerCase();
+
+  if (trimmedFirstName.length < 2 || trimmedLastName.length < 2) {
+    console.log('Name too short');
+    return res.sendFile(__dirname + '/failure.html');
+  }
+
+  if (trimmedEmail.length > 254) {
+    // RFC 5321 limit
+    console.log('Email too long');
     return res.sendFile(__dirname + '/failure.html');
   }
 
   const data = {
     members: [
       {
-        email_address: email,
+        email_address: trimmedEmail,
         status: 'subscribed',
         merge_fields: {
-          FNAME: firstName,
-          LNAME: lastName,
+          FNAME: trimmedFirstName,
+          LNAME: trimmedLastName,
         },
       },
     ],

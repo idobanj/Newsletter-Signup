@@ -9,36 +9,188 @@
   </head>
 
   <body class="text-center">
-    <form action="/" method="post" class="form-signin">
+    <form action="/" method="post" class="form-signin" id="signupForm">
       <img class="mb-4" src="image/logo 2.jpg" alt="" width="72" height="72" />
 
       <h1 class="h4 mb-3 fw-normal d-inline-block">Signup to My Newsletter!</h1>
 
-      <input
-        name="firstName"
-        type="text"
-        class="form-control top form-floating"
-        placeholder="First Name"
-        required
-        autofocus />
+      <div class="form-group">
+        <input
+          name="firstName"
+          type="text"
+          class="form-control top form-floating"
+          placeholder="First Name"
+          required
+          autofocus
+          id="firstName" />
+        <div class="invalid-feedback" id="firstNameError"></div>
+      </div>
 
-      <input
-        name="lastName"
-        type="text"
-        class="form-control middle form-floating"
-        placeholder="Last Name"
-        required />
+      <div class="form-group">
+        <input
+          name="lastName"
+          type="text"
+          class="form-control middle form-floating"
+          placeholder="Last Name"
+          required
+          id="lastName" />
+        <div class="invalid-feedback" id="lastNameError"></div>
+      </div>
 
-      <input
-        name="email"
-        type="email"
-        class="form-control bottom form-floating"
-        placeholder="Email"
-        required />
+      <div class="form-group">
+        <input
+          name="email"
+          type="email"
+          class="form-control bottom form-floating"
+          placeholder="Email"
+          required
+          id="email" />
+        <div class="invalid-feedback" id="emailError"></div>
+      </div>
 
-      <button class="btn btn-lg btn-primary btn-block w-100 py-2" type="submit">
+      <button
+        class="btn btn-lg btn-primary btn-block w-100 py-2"
+        type="submit"
+        id="submitBtn">
         Sign Me Up
       </button>
     </form>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('signupForm');
+        const firstName = document.getElementById('firstName');
+        const lastName = document.getElementById('lastName');
+        const email = document.getElementById('email');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Email validation function
+        function isValidEmail(email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        }
+
+        // Name validation function
+        function isValidName(name) {
+          return name.trim().length >= 2 && /^[a-zA-Z\s]+$/.test(name);
+        }
+
+        // Show error message
+        function showError(input, message) {
+          input.classList.add('is-invalid');
+          const errorDiv = document.getElementById(input.id + 'Error');
+          if (errorDiv) {
+            errorDiv.textContent = message;
+          }
+        }
+
+        // Clear error message
+        function clearError(input) {
+          input.classList.remove('is-invalid');
+          const errorDiv = document.getElementById(input.id + 'Error');
+          if (errorDiv) {
+            errorDiv.textContent = '';
+          }
+        }
+
+        // Real-time validation
+        firstName.addEventListener('blur', function () {
+          if (this.value.trim() === '') {
+            showError(this, 'First name is required');
+          } else if (!isValidName(this.value)) {
+            showError(
+              this,
+              'First name must be at least 2 characters and contain only letters'
+            );
+          } else {
+            clearError(this);
+          }
+        });
+
+        lastName.addEventListener('blur', function () {
+          if (this.value.trim() === '') {
+            showError(this, 'Last name is required');
+          } else if (!isValidName(this.value)) {
+            showError(
+              this,
+              'Last name must be at least 2 characters and contain only letters'
+            );
+          } else {
+            clearError(this);
+          }
+        });
+
+        email.addEventListener('blur', function () {
+          if (this.value.trim() === '') {
+            showError(this, 'Email is required');
+          } else if (!isValidEmail(this.value)) {
+            showError(this, 'Please enter a valid email address');
+          } else {
+            clearError(this);
+          }
+        });
+
+        // Form submission validation
+        form.addEventListener('submit', function (e) {
+          let isValid = true;
+
+          // Validate first name
+          if (firstName.value.trim() === '') {
+            showError(firstName, 'First name is required');
+            isValid = false;
+          } else if (!isValidName(firstName.value)) {
+            showError(
+              firstName,
+              'First name must be at least 2 characters and contain only letters'
+            );
+            isValid = false;
+          } else {
+            clearError(firstName);
+          }
+
+          // Validate last name
+          if (lastName.value.trim() === '') {
+            showError(lastName, 'Last name is required');
+            isValid = false;
+          } else if (!isValidName(lastName.value)) {
+            showError(
+              lastName,
+              'Last name must be at least 2 characters and contain only letters'
+            );
+            isValid = false;
+          } else {
+            clearError(lastName);
+          }
+
+          // Validate email
+          if (email.value.trim() === '') {
+            showError(email, 'Email is required');
+            isValid = false;
+          } else if (!isValidEmail(email.value)) {
+            showError(email, 'Please enter a valid email address');
+            isValid = false;
+          } else {
+            clearError(email);
+          }
+
+          if (!isValid) {
+            e.preventDefault();
+            submitBtn.disabled = false;
+          } else {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing up...';
+          }
+        });
+
+        // Clear errors on input
+        [firstName, lastName, email].forEach((input) => {
+          input.addEventListener('input', function () {
+            if (this.classList.contains('is-invalid')) {
+              clearError(this);
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>
